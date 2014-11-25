@@ -1,0 +1,44 @@
+###############
+# object file #
+###############
+*.o
+*.lo
+*.la
+*.deps
+*.libs
+
+###############
+# build       #
+###############
+build
+config.h
+
+###############
+# config      #
+###############
+*.cnf
+
+###############
+# output      #
+###############
+include/
+lib/
+bin/
+tools/train/lgdpj
+tools/train/lgsrl
+tools/train/otcws
+tools/train/otcws-customized
+tools/train/otpos
+tools/train/otner
+tools/train/maxent
+
+###############
+# data file   #
+###############
+new_ltp_data/
+ltp_data/
+
+##################
+# running folder #
+##################
+dummy/
