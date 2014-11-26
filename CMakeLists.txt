@@ -5,8 +5,6 @@ project ("LTP - Chinese Word Segmentation Component.")
 # -- config cmake modules path
 set (CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-set (CMAKE_CXX_FLAGS "-g")
-
 if (APPLE)
   set(CMAKE_CXX_FLAGS "-std=c++11 -stdlib=libstdc++ -Wno-error=c++11-narrowing")
 endif(APPLE)
