@@ -274,6 +274,10 @@ Segmentor::build_configuration(void) {
 
 void
 Segmentor::build_lexicon_match_state(Instance* inst) {
+  build_lexicon_match_state(model, inst);
+}
+void
+Segmentor::build_lexicon_match_state(Model * mdl, Instance* inst) {
   // cache lexicon features.
   int len = inst->size();
 
@@ -289,8 +293,8 @@ Segmentor::build_lexicon_match_state(Instance* inst) {
       word = word + inst->forms[j];
 
       // it's not a lexicon word
-      if (!model->internal_lexicon.get(word.c_str())
-          && !model->external_lexicon.get(word.c_str())) {
+      if (!mdl->internal_lexicon.get(word.c_str())
+          && !mdl->external_lexicon.get(word.c_str())) {
         continue;
       }
 
@@ -430,7 +434,7 @@ void
 Segmentor::calculate_scores(const Instance * inst, const Model* mdl,
     const DecodeContext* ctx, bool use_avg, ScoreMatrix* scm) {
   int len = inst->size();
-  int L = model->num_labels();
+  int L = mdl->num_labels();
 
   scm->uni_scores.resize(len, L); scm->uni_scores = NEG_INF;
   scm->bi_scores.resize(L, L);    scm->bi_scores = NEG_INF;

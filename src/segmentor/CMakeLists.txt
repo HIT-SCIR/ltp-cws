@@ -8,7 +8,8 @@ set (segment_SRC
     rulebase.cpp
     model.cpp
     extractor.cpp
-    segmentor.cpp)
+    segmentor.cpp
+    customized_segmentor.cpp)
 
 # -----------------------------------------------
 # STATIC LIBRARY
