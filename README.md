@@ -31,7 +31,7 @@ LTP的分词模块基于结构化感知器（Structured Perceptron）算法构�
 
 #使用分词可执行程序
 
-编译成功后，会在./bin/文件夹下生成如下四个分词程序:
+编译成功后，会在./bin/文件夹下生成如下六个分词程序:
 
 ##cws_cmdline
 
@@ -70,7 +70,7 @@ model_path 表示模型文件的路径，lexicon_path 表示领域词典文件�
 
 运行命令：
 
-    cws_cmdline model_path lexicon_path thread_num
+    multi_cws_cmdline model_path lexicon_path thread_num
     
 说明：
 
@@ -82,7 +82,52 @@ model_path 表示模型文件的路径，lexicon_path 表示领域词典文件�
 
 运行示例：
 
-    cws_cmdline cws.model dict.txt 4 <document.txt >result.txt
+    multi_cws_cmdline cws.model dict.txt 4 <document.txt >result.txt
+
+##customized_cws_cmdline
+
+功能：
+
+加载两个模型模型，基础模型和增量模型，以及外部词典对输入文本进行个性化分词。关于个性化分词的介绍参考[otcws-customized](#otcws-customized)
+
+运行命令：
+
+    customized_cws_cmdline baseline_model_path customized_model_path lexicon_path
+
+说明：
+
+baseline_model_path 表示基础模型文件的路径，customized_model_path表示增量模型文件的路径，lexicon_path 表示领域词典文件的路径。其中，领域词典是一个可选的参数。
+
+输入输出：
+
+输入输出为标准输入输出。
+
+运行示例：
+
+    customized_cws_cmdline seg.4.model cus.4.model dict.txt <document.txt >result.txt
+
+##multi_customized_cws_cmdline
+
+功能：
+
+其功能和customized_cws_cmdline一致，特点是支持多线程的运行。
+
+运行命令：
+
+    multi_customized_cws_cmdline baseline_model_path customized_model_path lexicon_path thread_num
+    
+说明：
+
+前三个参数和customized_cws_cmdline一致，thread_num表示运行的线程数。
+
+输入输出：
+
+输入输出为标准输入输出。
+
+运行示例：
+
+    multi_customized_cws_cmdline seg.4.model cus.4.model dict.txt 4 <document.txt >result.txt
+
     
 另外还有两个可执行程序是otcws、otcws-customized，它们是训练套件，参加下文[使用分词训练套件](#使用分词训练套件)。
 
@@ -149,7 +194,7 @@ model_path 表示模型文件的路径，lexicon_path 表示领域词典文件�
 
 ## 分词接口
 
-分词主要提供三个接口：
+分词主要提供五个接口：
 
 **void * segmentor_create_segmentor**
 
@@ -162,6 +207,24 @@ model_path 表示模型文件的路径，lexicon_path 表示领域词典文件�
 | 参数名 | 参数描述 |
 |--------|----------|
 |const char * path | 指定模型文件的路径 |
+|const char * lexicon_path | 指定外部词典路径。如果lexicon_path为NULL，则不加载外部词典 |
+
+返回值：
+
+返回一个指向分词器的指针。
+
+**void * segmentor_create_segmentor**
+
+功能：
+
+读取两个模型文件，初始化个性化分词器。虽然函数名称和上面的一样，但是参数列表不同。
+
+参数：
+
+| 参数名 | 参数描述 |
+|--------|----------|
+|const char * baseline_model_path | 基础模型文件的路径 |
+|const char * customized_model_path | 增量模型文件的路径 |
 |const char * lexicon_path | 指定外部词典路径。如果lexicon_path为NULL，则不加载外部词典 |
 
 返回值：
@@ -202,6 +265,23 @@ model_path 表示模型文件的路径，lexicon_path 表示领域词典文件�
 
 返回结果中词的个数。
 
+**int segmentor_customized_segment**
+
+功能：
+
+调用个性化分词接口。
+
+参数：
+
+| 参数名 | 参数描述 |
+|--------|----------|
+|void * segmentor | 分词器的指针 |
+|const std::string & line | 待分词句子 |
+|std::vector\<std::string\> & words| 结果分词序列 |
+
+返回值：
+
+返回结果中词的个数。
 
 #使用分词训练套件
 
