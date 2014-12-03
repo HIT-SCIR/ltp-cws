@@ -96,7 +96,7 @@ model_path 表示模型文件的路径，lexicon_path 表示领域词典文件�
 
 说明：
 
-baseline_model_path 表示基础模型文件的路径，baseline_model_path表示增量模型文件的路径，lexicon_path 表示领域词典文件的路径。其中，领域词典是一个可选的参数。
+baseline_model_path 表示基础模型文件的路径，customized_model_path表示增量模型文件的路径，lexicon_path 表示领域词典文件的路径。其中，领域词典是一个可选的参数。
 
 输入输出：
 
@@ -114,7 +114,7 @@ baseline_model_path 表示基础模型文件的路径，baseline_model_path表�
 
 运行命令：
 
-    multi_customized_cws_cmdlinebaseline_model_path customized_model_path lexicon_path thread_num
+    multi_customized_cws_cmdline baseline_model_path customized_model_path lexicon_path thread_num
     
 说明：
 
