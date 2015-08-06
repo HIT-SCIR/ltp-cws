@@ -19,15 +19,10 @@ private:
   int _num_entries;
   bool _valid;
 
-#if defined(_MSC_VER)
-  typedef stdext::hash_map<std::string, std::string>        internal_entries_t;
-  typedef stdext::hash_map<std::string, internal_entries_t> internal_sections_t;
-#else
-  typedef std::tr1::unordered_map<std::string, std::string,
+  typedef std::unordered_map<std::string, std::string,
           __Default_String_HashFunction> internal_entries_t;
-  typedef std::tr1::unordered_map<std::string, internal_entries_t,
+  typedef std::unordered_map<std::string, internal_entries_t,
           __Default_String_HashFunction> internal_sections_t;
-#endif  //  end for _WIN32
 
   internal_sections_t sec;
 
@@ -58,25 +53,26 @@ public:
 
         // handle following case:
         // x = y # comments
-        line = cutoff(line, "#");
+        line = strutils::cutoff(line, "#");
         if (line.size() == 0) {
           continue;
         }
         //  section name
-        if ( startswith(line, "[") && endswith(line, "]") ) {
+        if (strutils::startswith(line, "[") &&
+            strutils::endswith(line, "]") ) {
           int len = line.length();
           section_name = line.substr(1, len - 2);
           sec[section_name] = internal_entries_t();
           section = &sec[section_name];
         }
 
-        std::vector<std::string> sep = split_by_sep(line, "=");
+        std::vector<std::string> sep = strutils::split_by_sep(line, "=");
         if (sep.size() != 2) {
           continue;
         }
 
-        sep[0] = chomp(sep[0]);
-        sep[1] = chomp(sep[1]);
+        sep[0] = strutils::trim_copy(sep[0]);
+        sep[1] = strutils::trim_copy(sep[1]);
 
         if (!section) {
           _valid = false;
@@ -153,8 +149,8 @@ public:
       return false;
     }
 
-    if (is_int(strval)) {
-      intval = to_int(strval);
+    if (strutils::is_int(strval)) {
+      intval = strutils::to_int(strval);
       return true;
     } else {
       return false;
@@ -169,8 +165,8 @@ public:
       return false;
     }
 
-    if (is_int(strval)) {
-      intval = to_int(strval);
+    if (strutils::is_int(strval)) {
+      intval = strutils::to_int(strval);
       return true;
     } else {
       return false;

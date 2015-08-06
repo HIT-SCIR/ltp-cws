@@ -1,0 +1,4 @@
+keep_stable.txt
+README.md
+configure
+.gitignore
