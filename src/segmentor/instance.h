@@ -9,6 +9,7 @@
 namespace ltp {
 namespace segmentor {
 
+// input data (x,y) = instance
 class Instance {
 public:
   Instance() {}
@@ -16,64 +17,70 @@ public:
   ~Instance() {
   }
 
-  inline size_t size() const {
-    return forms.size();
-  }
+  size_t size() const { return forms.size(); }
 
-  int num_errors() {
-    int len = size();
-    if ((len != tagsidx.size()) || (len != predicted_tagsidx.size())) {
-      return -1;
-    }
+public:
+  std::vector< std::string >  raw_forms; // raw characters of the input
+  std::vector< std::string >  forms; // characters after preprocessing
+  std::vector< int >          chartypes; // types of characters, digit, text, punct etc.
+  std::vector< int >          lexicon_match_state;
+  std::vector< std::string >  tags; // tags of characters, {B I E S}
+  std::vector< int >          tagsidx; // int tags
+  std::vector< std::string >  predict_tags; 
+  std::vector< int >          predict_tagsidx;
+  std::vector< std::string >  words; // words of the input
+  std::vector< std::string >  predict_words;
+};
 
-    int ret = 0;
-    for (int i = 0; i < len; ++ i) {
-      if (tagsidx[i] != predicted_tagsidx[i]) {
-        ++ ret;
-      }
+class InstanceUtils {
+public:
+  /**
+   * return the number of tags that predict wrong
+   *
+   *  @param[in]  answer  The answer word vector.
+   *  @return int  the number
+   */
+  static size_t num_errors(const std::vector<int>& answer,
+      const std::vector<int>& predict) {
+    if (answer.size() != predict.size()) { return answer.size(); }
+
+    size_t ret = 0;
+    for (size_t i = 0; i < answer.size(); ++ i) {
+      if (answer[i] != predict[i]) { ++ ret; }
     }
 
     return ret;
   }
 
-  int num_predicted_words() {
-    return predicted_words.size();
-  }
+  /**
+   * calculate the number of words that predict right
+   *  @return int  the number
+   */
+  static int num_recalled_words(const std::vector<std::string>& answer,
+      const std::vector<std::string>& predict) {
+    int len = 0, ret = 0;
+    int answer_len = 0, predict_len = 0;
 
-  int num_gold_words() {
-    return words.size();
-  }
+    for (size_t i = 0; i < answer.size(); ++ i) { len += answer[i].size(); }
 
-  int num_recalled_words() {
-    int len = 0;
-    int ret = 0;
-    int gold_len = 0, predicted_len = 0;
-
-    for (int i = 0; i < words.size(); ++ i) {
-      len += words[i].size();
-    }
-
-    for (int i = 0, j = 0; i < words.size() && j < predicted_words.size(); ) {
-      if (words[i] == predicted_words[j]) {
+    for (size_t i = 0, j = 0; i < answer.size() && j < predict.size(); ) {
+      if (answer[i] == predict[j]) {
         ++ ret;
-        gold_len += words[i].size();
-        predicted_len += predicted_words[j].size();
+        answer_len += answer[i].size();
+        predict_len += predict[j].size();
 
-        ++ i;
-        ++ j;
+        ++ i; ++ j;
       } else {
-        gold_len += words[i].size();
-        predicted_len += predicted_words[j].size();
+        answer_len += answer[i].size();
+        predict_len += predict[j].size();
 
-        ++ i;
-        ++ j;
-
-        while (gold_len < len && predicted_len < len) {
-          if (gold_len < predicted_len) {
-            gold_len += words[i].size();
+        ++ i; ++ j;
+        while (answer_len < len && predict_len < len) {
+          if (answer_len < predict_len) {
+            answer_len += answer[i].size();
             ++ i;
-          } else if (gold_len > predicted_len) {
-            predicted_len += predicted_words[j].size();
+          } else if (answer_len > predict_len) {
+            predict_len += predict[j].size();
             ++ j;
           } else {
             break;
@@ -81,21 +88,8 @@ public:
         }
       }
     }
-
     return ret;
   }
-
-public:
-  std::vector< std::string >  raw_forms;
-  std::vector< std::string >  forms;
-  std::vector< int >          chartypes;
-  std::vector< std::string >  tags;
-  std::vector< int >          tagsidx;
-  std::vector< std::string >  predicted_tags;
-  std::vector< int >          predicted_tagsidx;
-  std::vector< std::string >  words;
-  std::vector< std::string >  predicted_words;
-  std::vector< int >          lexicon_match_state;
 };
 
 }     //  end for namespace segmentor

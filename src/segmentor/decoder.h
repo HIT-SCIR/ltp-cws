@@ -3,66 +3,34 @@
 
 #include <iostream>
 #include <vector>
-#include "segmentor/instance.h"
-#include "segmentor/rulebase.h"
-#include "segmentor/score_matrix.h"
+#include "framework/decoder.h"
 #include "utils/math/mat.h"
 
 namespace ltp {
 namespace segmentor {
 
-// data structure for lattice item
-class LatticeItem {
+class SegmentationConstrain: public framework::ViterbiDecodeConstrain {
+private:
+  const std::vector<int>* chartypes;
 public:
-  LatticeItem (int _i, int _l, double _score, const LatticeItem * _prev) :
-    i(_i),
-    l(_l),
-    score(_score),
-    prev(_prev) {}
+  SegmentationConstrain();
 
-  LatticeItem (int _l, double _score) :
-    i(0),
-    l(_l),
-    score(_score),
-    prev(0) {}
+  void regist(const std::vector<int>* chartypes);
 
-public:
-  int         i;
-  int         l;
-  double        score;
-  const LatticeItem * prev;
+  bool can_tran(const size_t& i, const size_t& j) const;
+
+  bool can_emit(const size_t& i, const size_t& j) const;
 };
 
-class Decoder {
+class PartialSegmentationConstrain: public SegmentationConstrain {
 public:
-  Decoder (int _l, rulebase::RuleBase & _base) : L(_l), base(_base) {}
+  std::vector<int> mat;
+public:
+  PartialSegmentationConstrain();
 
-  //!
-  void decode(Instance * inst, const ScoreMatrix* scm);
+  void append(const int& mask);
 
-private:
-  void init_lattice(const Instance * inst);
-  void viterbi_decode(const Instance * inst, const ScoreMatrix* scm);
-  void get_result(Instance * inst);
-  void free_lattice();
-
-private:
-  int L;
-
-  math::Mat< const LatticeItem * > lattice;
-  rulebase::RuleBase base;
-
-  void lattice_insert(const LatticeItem * &position,
-                      const LatticeItem * const item) {
-    if (position == NULL) {
-      position = item;
-    } else if (position->score < item->score) {
-      delete position;
-      position = item;
-    } else {
-      delete item;
-    }
-  }
+  bool can_emit(const size_t& i, const size_t& j) const;
 };
 
 }       //  end for namespace segmentor
